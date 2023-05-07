@@ -34,6 +34,9 @@ first train dataset has to be split into training and validation parts
 
 **Validation dataset** is used to validate how well your model is doing before performing predictions on test dataset. Having a validation dataset helps to detect wheter the model is overtrained
 
+Tensorflow provides <code>tf.data.Dataset</code> api which is very usefull when creating data pipelines for ML models, since it supports caching, batching, one can perform data preprocessing using <code>.map</code> method on <code>Dataset</code> object.
+
+Having created functions that yield images and masks we can use <code>from_generator</code> method to create datasets from generators
 # Modeling
 
 **UNET** is a Conv net architecture proposed by Olaf Ronneberger, Philipp Fischer, Thomas Brox in their paper [U-Net: Convolutional Networks for Biomedical Image Segmentation
@@ -97,6 +100,23 @@ The callbacks I am going to use:
 - <code>ModelCheckpoint</code>
 - <code>ReduceLROnPlateau</code>
 - <code>EarlyStopping</code>
+
+# Loss function
+
+Since instance segmantation is binary classification problem, one might think binary crossentropy loss function is a perfect fit, however this is not the case. Binary crossentropy function makes training segmentation models difficult because it conisders only one pixel, it doesn't take into the account the whole image. How can we do better?
+
+<h2>Dice Loss</h2>
+Dice coeficient is a statistic from 1940s developed to be a measure of similarity between two samples. It was introduced to the field of computer vision in 2016 for 3d segmantation by Milletari et al.
+
+$$D = \frac{2\sum\limits_{i = 1}^{n} p_{i}g_{i}}{\sum\limits_{i = 1}^{n} p_{i}^{2} + \sum\limits_{i = 1}^{n} g_{i}^{2}}$$
+
+$p_{i}$ and $g_{i}$ are the values of corresponding pixels in reality numerator is intersection of two sets and denominator is the sum of areas of these two sets, dice coefficient values range from 0 to 1 where 1 would mean that the images are practically the same and 0 would mean that there is no similarity at all. Since optimizers in machine learning are trying to minimize the loss function dice loss is defined as
+$$\ell = 1 - D$$
+
+<h2>Intersection Over Union</h2>
+IoU is this competitions evaluation metric, it is defined as
+$$IoU(A, B) = \frac{\mid A \cap B \mid}{\mid A \cup B \mid}$$
+Where $A$ and $B$ both are sets, simillariy to dice coeficient it takes values between 0 and 1 where 1 would mean that the two sets are identical and 0 - that the sets have nothing in common. IoU isn't used as a loss function mainly becouse it is not differentiable.
 
 # Testing 
 After training the model we use the model for generate predictions (Segmentations and masking)
