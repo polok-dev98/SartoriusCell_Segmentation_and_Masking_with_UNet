@@ -1,4 +1,4 @@
-# Sartorius Cell Instance Segmentation and Masking using UNet with attention machanism. Code done with Tensorflow framework.
+# Sartorius Cell Instance Segmentation and Masking using UNet with attention. Code done with Tensorflow framework.
 
 
 
